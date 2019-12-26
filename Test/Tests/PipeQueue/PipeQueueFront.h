@@ -1,8 +1,6 @@
-#include "../Pipelines/include/PipeQueue.hpp"
-#include <gtest/gtest.h>
+#include "../ClassHeader.h"
 
-
-TEST(PipeQueueTestInit, push)
+TEST(PipeQueueTestFront, Front)
 {
     PLS::PipeQueue<std::string> testQueue;
     testQueue.push_back("Hello");
@@ -13,17 +11,4 @@ TEST(PipeQueueTestInit, push)
 
     ASSERT_EQ(testQueue.front(), ", world!");
     testQueue.pop_front();
-}
-
-
-
-
-
-
-
-
-
-int main(int argc, char **argv) {
-    testing::InitGoogleTest(&argc, argv);
-    return RUN_ALL_TESTS();
 }
