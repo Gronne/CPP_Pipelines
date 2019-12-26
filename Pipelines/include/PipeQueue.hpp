@@ -23,10 +23,11 @@ namespace PLS
   class PipeQueue
   {
   private:
-    Container container;
-    std::mutex access_lock;
+    Container container_;
+    std::mutex access_lock_;
+
   public:
-    PipeQueue() : container()
+    PipeQueue() : container_()
     {}
     ~PipeQueue()
     {
@@ -35,21 +36,21 @@ namespace PLS
     
     void push_back(T&& item)
     {
-      std::lock_guard<std::mutex> lock(access_lock); // RIIA style lock for current scope
-      container.push_back(std::move(item));
+      std::lock_guard<std::mutex> lock(access_lock_); // RIIA style lock for current scope
+      container_.push_back(std::move(item));
     }
 
     T &&front()
     {
-      std::lock_guard<std::mutex> lock(access_lock);
-      return std::move(container.front());
+      std::lock_guard<std::mutex> lock(access_lock_);
+      return std::move(container_.front());
     }
 
     // Can be moved to cpp file
     void pop_front()
     {
-      std::lock_guard<std::mutex> lock(access_lock);
-      container.pop_front();
+      std::lock_guard<std::mutex> lock(access_lock_);
+      container_.pop_front();
     }
   };
 }
