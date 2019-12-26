@@ -10,4 +10,4 @@ SET(SOURCE_FILES source/main.cpp)
 link_directories(../Pipelines)
 
 add_executable(PLS_Example.out ${SOURCE_FILES})
-target_link_libraries(PLS_Example.out -lPLS)
+target_link_libraries(PLS_Example.out -lPLS -lpthread)

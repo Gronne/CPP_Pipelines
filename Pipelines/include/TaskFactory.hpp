@@ -27,15 +27,15 @@ namespace PLS {
     }
 
     // https://stackoverflow.com/questions/33135304/c-create-an-stdpackaged-task-of-a-generic-stdbind
-    template<class F, class...Args, typename R = std::result_of_t<std::decay_t<F>&&(Args...)>>
-    std::packaged_task<R(Args...)> startAsyncTask(F&& callable, Args&&...args)
-    {
-      std::packaged_task<R(Args...)> task(
-        [callable = std::forward<F>(callable)] (auto&&...args) {
-          callable(args...);
-      });
-      return task;
-    }
+    // template<class F, class...Args, typename R = std::result_of_t<std::decay_t<F>&&(Args...)>>
+    // std::packaged_task<R(Args...)> startAsyncTask(F&& callable, Args&&...args)
+    // {
+    //   std::packaged_task<R(Args...)> task(
+    //     [callable = std::forward<F>(callable)] (auto&&...args) {
+    //       callable(args...);
+    //   });
+    //   return task;
+    // }
 
     // We create and execute the task imidiatly, thus only returning a future
     template<class F, class...Args, typename R = std::result_of_t<std::decay_t<F>&&(Args...)>>
@@ -46,6 +46,21 @@ namespace PLS {
       task_td.detach();
       return task.get_future();
     }
+
+    template<class F, class... Args, typename R = std::result_of_t<std::decay_t<F>&&(Args...)>>
+    std::future<R> startAsyncTask(F&& callable, Args&&... args)
+    {
+      std::future<R> task = std::async(std::launch::async, callable, std::ref(args)...); 
+      
+
+
+
+      // std::packaged_task<R(Args...)> task(callable);
+      // std::thread task_td(std::move(task), args...);
+      // task_td.detach();
+      return task;
+    } 
+
     
   };  
 }

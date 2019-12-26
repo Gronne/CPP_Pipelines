@@ -45,14 +45,12 @@ int main()
 
   TaskFactory factory;
   cout << "Starting to get lines" << endl;
-  auto t1 = factory.startAsyncTask(readFile, filePath, lines); // Read lines from books
+  future<void> f1 = factory.startAsyncTask(readFile, filePath, lines); // Read lines from books
   cout << "Starting to get words" << endl;
-  future<void> t2 = factory.startAsyncTaskThreaded(lambda, lines, words); // Test with lambda
+  future<void> t2 = factory.startAsyncTask(lambda, lines, words); // Test with lambda
 
-  cout << "Starting t1" << endl;
-  t1(filePath, lines);
   cout << "Waiting for t1 to end" << endl;
-  t1.get_future().wait();
+  f1.wait();
   cout << "Waiting for t2 to end" << endl;
   t2.wait();
 
