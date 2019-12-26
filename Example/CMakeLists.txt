@@ -6,5 +6,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 include_directories(../Pipelines/include)
 SET(SOURCE_FILES source/main.cpp)
 
+
+link_directories(../Pipelines)
+
 add_executable(PLS_Example.out ${SOURCE_FILES})
-link_directories(libPLS.so)
+target_link_libraries(PLS_Example.out -lPLS)

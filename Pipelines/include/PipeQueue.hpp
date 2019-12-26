@@ -2,6 +2,19 @@
 #include <mutex>
 #include <utility>
 
+/*
+* TODO LIST:
+* - Add EOF signal
+* - Rule of x
+* - Move none template functions to cpp
+* QUESTIONS: 
+* - Do we need all the compare operators? I assume we don't intend to perform 
+    algorithms on this container
+* NOTE: 
+* - Class naming uses Pascal casing
+* - Snake case is used on container in attempt to keep the common interface
+* - Otherwise camel casing is used
+*/
 
 
 namespace PLS
@@ -19,11 +32,6 @@ namespace PLS
     {
       // May be omitted
     }
-    //TODO rule of X
-    // copy constructor
-    // assignment operator
-    // move constructor
-    // move assignment operator
     
     void push_back(T&& item)
     {
