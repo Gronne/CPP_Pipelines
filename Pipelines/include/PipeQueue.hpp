@@ -25,6 +25,7 @@ namespace PLS
   private:
     Container container;
     std::mutex access_lock;
+    bool is_eof;
   public:
     PipeQueue() : container()
     {}
@@ -50,6 +51,17 @@ namespace PLS
     {
       std::lock_guard<std::mutex> lock(access_lock);
       container.pop_front();
+    }
+
+    // Can
+    bool eof()
+    {
+      return is_eof && container.empty();
+    }
+
+    void set_eof()
+    {
+      is_eof = true;
     }
   };
 }
