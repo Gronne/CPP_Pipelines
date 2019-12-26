@@ -9,9 +9,11 @@
 using namespace std;
 using namespace PLS;
 
-void readFile(string path, PipeQueue<string>& out)
+void readFile(string& path, PipeQueue<string>& out)
 {
+  cout << "readFile: path: "<< path << endl;
   ifstream input(path);
+  int i = 0;
   if(input.is_open())
   {
     while (!input.eof())
@@ -19,8 +21,15 @@ void readFile(string path, PipeQueue<string>& out)
       string line;
       getline(input, line);
       out.push_back(std::move(line));
+      if(++i%1000 == 0)
+        cout << "readFile count: " << i << endl;
     }
   }
+  else
+  {
+    cout << "failed to open " << path << endl;
+  }
+  out.set_eof(); 
 }
 
 int main()
@@ -29,7 +38,8 @@ int main()
   PipeQueue<string> lines, words;
 
   decltype(auto) lambda = [](PipeQueue<string>& in, PipeQueue<string>& out) {
-    while(true)
+    int i = 0;
+    while(!in.eof())
     {
       stringstream line(in.front());
       string word;
@@ -37,11 +47,14 @@ int main()
       
       while (line >> word)
         out.push_back(std::move(word));
+      if(++i%10000 == 0)
+        cout << "Lines read in lambda: " << i << endl;
     }
+    out.set_eof();
   };
 
   function f = lambda;
-  string filePath = "Books/Dracula.txt";
+  string filePath = "Example/Books/Dracula.txt";
 
   TaskFactory factory;
   cout << "Starting to get lines" << endl;
