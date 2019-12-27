@@ -56,7 +56,7 @@ namespace PLS
     // Can
     bool eof()
     {
-      return is_eof_ && container.empty();
+      return is_eof_ && container_.empty();
     }
 
     void set_eof()
