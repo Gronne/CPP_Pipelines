@@ -5,29 +5,13 @@
 #include <type_traits>
 
 namespace PLS {
+  //SFINAE check for function has_wait
+  template<typename T, typename = void>
+  struct has_wait : std::false_type { };
 
-  // inspiration from https://stackoverflow.com/questions/29603364/type-trait-to-check-that-all-types-in-a-parameter-pack-are-copy-constructible/29603857#29603857
-  template<typename... Conds>
-  struct and_ : std::true_type {};
-
-  template<typename Cond, typename... Conds>
-  struct and_<Cond, Conds...>
-  : std::conditional_t<Cond::value, and_<Conds...>, std::false_type>
-  { };
-
-  // SFINAE
-  // https://gist.github.com/fenbf/d2cd670704b82e2ce7fd
   template<typename T>
-  class has_wait {
-    typedef char Yes[1];
-    typedef char No[2];
-
-    template<typename C> static Yes& test( decltype(&C::wait) );
-    template<typename C> static No& test(...);
-  public:
-    static const bool value = sizeof(test<T>(0)) == sizeof(Yes);
-    //enum { value = sizeof(test<T>(0)) == sizeof(Yes) };
-  };
+  struct has_wait<T, std::void_t<decltype(std::declval<T>().wait())> > : std::true_type { };
+  
 
   template<typename... Args>
   using is_awaitable = std::conjunction<has_wait<Args>...>;
