@@ -88,16 +88,22 @@ namespace PLS
       container_ = std::move(other.container_);
       return *this;
     }
+
+    const ssize_t size() {
+      return container_.size();
+    }
     
     
-    void push_back(T&& item)
-    {
+    void push_back(T&& value) {
       std::lock_guard<std::mutex> lock(access_lock_); // RIIA style lock for current scope
-      container_.push_back(std::move(item));
+      container_.push_back(std::move(value));
     }
 
-    T &&front()
-    {
+    void push_back(const T & value) {
+      container_.push_back(value);
+    }
+
+    T &&front() {
       std::lock_guard<std::mutex> lock(access_lock_);
       return std::move(container_.front());
     }
