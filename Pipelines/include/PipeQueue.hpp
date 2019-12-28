@@ -33,6 +33,37 @@ namespace PLS
     {
       // May be omitted
     }
+
+    //Copy Constructer
+    PipeQueue(const PipeQueue &other)
+    {
+      std::lock_guard<std::mutex> lock(access_lock_);
+      container_ = other.container_;
+    }
+
+    //Move Constructor
+    PipeQueue(PipeQueue&& other)
+    {
+      std::lock_guard<std::mutex> lock(access_lock_);
+      container_ = std::move(other.container_);
+    }
+
+    //Copy Assignment
+    PipeQueue& operator=(const PipeQueue& other)
+    {
+      std::lock_guard<std::mutex> lock(access_lock_);
+      container_ = other.container_;
+      return *this;
+    }
+
+    //Move Assignment
+    PipeQueue& operator=(PipeQueue&& other)
+    {
+      std::lock_guard<std::mutex> lock(access_lock_);
+      container_ = std::move(other.container_);
+      return *this;
+    }
+    
     
     void push_back(T&& item)
     {
