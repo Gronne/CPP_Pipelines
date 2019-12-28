@@ -19,14 +19,9 @@ namespace PLS {
 
   class TaskFactory
   {
-  private:
-    /* data */
   public:
-    TaskFactory();
-    ~TaskFactory();
-
     template<typename T, typename...Args>
-    void wait_all(T&& first, Args&& ...args)
+    static void wait_all(T&& first, Args&& ...args)
     {
       static_assert(is_awaitable<Args...>::value, "Argument in TaskFactory::wait_all(...) does not implement the wait function");
       first.wait();
@@ -34,7 +29,7 @@ namespace PLS {
     }
 
     template<typename T>
-    void wait_all(T&& future)
+    static void wait_all(T&& future)
     {
       future.wait();
     }
@@ -42,7 +37,7 @@ namespace PLS {
     
 
     template<class F, class... Args, typename R = std::result_of_t<std::decay_t<F>&&(Args...)>>
-    std::future<R> startAsyncTask(F&& callable, Args&&... args)
+    static std::future<R> startAsyncTask(F&& callable, Args&&... args)
     {
       std::future<R> task = std::async(std::launch::async, callable, std::ref(args)...); 
       return task;

@@ -58,15 +58,14 @@ int main()
   function f = lambda;
   string filePath = "Example/Books/Dracula.txt";
 
-  TaskFactory factory;
   cout << "Starting to get lines" << endl;
-  future<void> f1 = factory.startAsyncTask(readFile, filePath, lines); // Read lines from books
+  future<void> f1 = TaskFactory::startAsyncTask(readFile, filePath, lines); // Read lines from books
   cout << "Starting to get words" << endl;
-  future<void> f2 = factory.startAsyncTask(lambda, lines, words); // Test with lambda
+  future<void> f2 = TaskFactory::startAsyncTask(lambda, lines, words); // Test with lambda
   cout << "Starting to map words" << endl;
   
   // TODO: DOES NOT WORK YET
-  auto f3 = factory.startAsyncTask([](PipeQueue<string> &in, std::map<string, PipeQueue<string>> &map){
+  auto f3 = TaskFactory::startAsyncTask([](PipeQueue<string> &in, std::map<string, PipeQueue<string>> &map){
     while(!in.eof())
     {
       string word(in.front());
@@ -91,7 +90,7 @@ int main()
   map);
 
   cout << "Waiting for all end" << endl;
-  factory.wait_all(f1, f2, f3);
+  TaskFactory::wait_all(f1, f2, f3);
 
   auto t = map.find("why");
   cout << "Word why count: " << t->second.size() << endl;
