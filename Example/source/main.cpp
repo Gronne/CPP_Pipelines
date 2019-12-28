@@ -9,9 +9,11 @@
 using namespace std;
 using namespace PLS;
 
-void readFile(string path, PipeQueue<string>& out)
+void readFile(string& path, PipeQueue<string>& out)
 {
+  cout << "readFile: path: "<< path << endl;
   ifstream input(path);
+  int i = 0;
   if(input.is_open())
   {
     while (!input.eof())
@@ -19,8 +21,15 @@ void readFile(string path, PipeQueue<string>& out)
       string line;
       getline(input, line);
       out.push_back(std::move(line));
+      if(++i%1000 == 0)
+        cout << "readFile count: " << i << endl;
     }
   }
+  else
+  {
+    cout << "failed to open " << path << endl;
+  }
+  out.set_eof(); 
 }
 
 int main()
@@ -29,7 +38,8 @@ int main()
   PipeQueue<string> lines, words;
 
   decltype(auto) lambda = [](PipeQueue<string>& in, PipeQueue<string>& out) {
-    while(true)
+    int i = 0;
+    while(!in.eof())
     {
       stringstream line(in.front());
       string word;
@@ -37,26 +47,24 @@ int main()
       
       while (line >> word)
         out.push_back(std::move(word));
+      if(++i%10000 == 0)
+        cout << "Lines read in lambda: " << i << endl;
     }
+    out.set_eof();
   };
 
   function f = lambda;
-  string filePath = "Books/Dracula.txt";
+  string filePath = "Example/Books/Dracula.txt";
 
   TaskFactory factory;
   cout << "Starting to get lines" << endl;
-  auto t1 = factory.startAsyncTask(readFile, filePath, lines); // Read lines from books
+  future<void> f1 = factory.startAsyncTask(readFile, filePath, lines); // Read lines from books
   cout << "Starting to get words" << endl;
-  future<void> t2 = factory.startAsyncTaskThreaded(lambda, lines, words); // Test with lambda
+  future<void> f2 = factory.startAsyncTask(lambda, lines, words); // Test with lambda
 
-  cout << "Starting t1" << endl;
-  t1(filePath, lines);
-  cout << "Waiting for t1 to end" << endl;
-  t1.get_future().wait();
-  cout << "Waiting for t2 to end" << endl;
-  t2.wait();
+  cout << "Waiting for all end" << endl;
+  factory.wait_all(f1, f2);
 
 
-  
-
+  //PipeQueue<string, std::vector<int>> test; // Test that another type in the vec
 }
