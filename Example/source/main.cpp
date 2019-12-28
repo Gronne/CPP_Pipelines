@@ -4,6 +4,7 @@
 #include <fstream>
 #include "PipeQueue.hpp"
 #include "TaskFactory.hpp"
+#include <map>
 
 
 using namespace std;
@@ -36,6 +37,7 @@ int main()
 {
   //std::cout << "Hello world!" << std::endl;
   PipeQueue<string> lines, words;
+  map<string, PipeQueue<string>> map;
 
   decltype(auto) lambda = [](PipeQueue<string>& in, PipeQueue<string>& out) {
     int i = 0;
@@ -61,10 +63,38 @@ int main()
   future<void> f1 = factory.startAsyncTask(readFile, filePath, lines); // Read lines from books
   cout << "Starting to get words" << endl;
   future<void> f2 = factory.startAsyncTask(lambda, lines, words); // Test with lambda
+  cout << "Starting to map words" << endl;
+  
+  // TODO: DOES NOT WORK YET
+  auto f3 = factory.startAsyncTask([](PipeQueue<string> &in, std::map<string, PipeQueue<string>> &map){
+    while(!in.eof())
+    {
+      string word(in.front());
+      in.pop_front();
+      
+      auto temp = map.find(word);
+      if(map.end() != temp)
+      {
+        temp->second.push_back(word);
+        map.insert_or_assign(temp->second.front(), temp->second);
+      }
+      else
+      {
+        PipeQueue<string> q;
+        q.push_back(word);
+        map.insert_or_assign(q.front(), q);
+      }
+    }
+    cout << "Mapping done" << endl;
+  },
+  words,
+  map);
 
   cout << "Waiting for all end" << endl;
-  factory.wait_all(f1, f2);
+  factory.wait_all(f1, f2, f3);
 
+  auto t = map.find("why");
+  cout << "Word why count: " << t->second.size() << endl;
 
   //PipeQueue<string, std::vector<int>> test; // Test that another type in the vec
 }
