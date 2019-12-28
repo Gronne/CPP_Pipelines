@@ -1,2 +1,5 @@
+#include "PipeQueueAssinment.h"
+#include "PipeQueueBack.h"
 #include "PipeQueueFront.h"
 #include "PipeQueueInit.h"
+#include "PipeQueueSize.h"
