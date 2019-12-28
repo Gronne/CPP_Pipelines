@@ -64,4 +64,7 @@ int main()
 
   cout << "Waiting for all end" << endl;
   factory.wait_all(f1, f2);
+
+
+  //PipeQueue<string, std::vector<int>> test; // Test that another type in the vec
 }
