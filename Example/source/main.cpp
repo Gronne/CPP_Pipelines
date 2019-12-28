@@ -60,14 +60,8 @@ int main()
   cout << "Starting to get lines" << endl;
   future<void> f1 = factory.startAsyncTask(readFile, filePath, lines); // Read lines from books
   cout << "Starting to get words" << endl;
-  future<void> t2 = factory.startAsyncTask(lambda, lines, words); // Test with lambda
+  future<void> f2 = factory.startAsyncTask(lambda, lines, words); // Test with lambda
 
-  cout << "Waiting for t1 to end" << endl;
-  f1.wait();
-  cout << "Waiting for t2 to end" << endl;
-  t2.wait();
-
-
-  
-
+  cout << "Waiting for all end" << endl;
+  factory.wait_all(f1, f2);
 }
