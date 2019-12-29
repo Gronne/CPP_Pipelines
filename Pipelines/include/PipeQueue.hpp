@@ -141,6 +141,18 @@ namespace PLS
         return false;
     }
 
+    bool operator==(PipeQueue& other)
+    {
+      std::lock_guard<std::mutex> lock(access_lock_);
+      return container_ == other.container_;
+    }
+
+    bool operator!=(PipeQueue& other)
+    {
+      std::lock_guard<std::mutex> lock(access_lock_);
+      return container_ != other.container_;
+    }
+
     template<typename H>
     friend PipeQueue<H>& operator<<(PipeQueue<H>& pipe, H&& input);
 
