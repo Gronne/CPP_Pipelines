@@ -28,51 +28,41 @@ namespace PLS
     std::mutex access_lock_;
     bool is_eof_;
   public:
-    PipeQueue() : container_(), is_eof_(false)
-    {
+    PipeQueue() : container_(), is_eof_(false) {
       static_assert(std::is_same<T, typename Container::value_type>::value, "T and value type of container is not the same");
-      // static_assert(container_implements<)
     }
-    ~PipeQueue()
-    {
-      // May be omitted
-    }
+    ~PipeQueue() { }
 
     //Initialization Constructor
-    PipeQueue(std::initializer_list<T> t_list) : PipeQueue()
-    {
+    PipeQueue(std::initializer_list<T> t_list) : PipeQueue() {
       for(auto &t : t_list)
         push(t);
     }
 
     //Copy Constructer
-    PipeQueue(const PipeQueue &other)
-    {
-      std::lock_guard<std::mutex> lock(access_lock_);
+    PipeQueue(const PipeQueue &other) {
+      std::lock_gsuard<std::mutex> lock(access_lock_);
       container_ = other.container_;
     }
 
     //Move Constructor
-    PipeQueue(PipeQueue&& other)
-    {
+    PipeQueue(PipeQueue&& other) {
       std::lock_guard<std::mutex> lock(access_lock_);
       container_ = std::move(other.container_);
     }
 
 
-    const ssize_t size() {
+    const ssize_t size()  {
       std::lock_guard<std::mutex> lock(access_lock_);
       return container_.size();
     }
 
-    bool empty() 
-    {
+    bool empty()  {
       std::lock_guard<std::mutex> lock(access_lock_);
       return container_.empty();
     }
 
-    void clear()
-    {
+    void clear()  {
       std::lock_guard<std::mutex> lock(access_lock_);
       container_.clear();
     }
@@ -88,10 +78,6 @@ namespace PLS
       container_.push_back(value);
     }
 
-    const T& unsafe_front()
-    {
-      return container_.front();
-    }
 
     bool try_pop(T & t) {
       std::lock_guard<std::mutex> lock(access_lock_);
@@ -103,37 +89,32 @@ namespace PLS
     }
 
     // Can
-    bool eof()
-    {
+    bool eof() const {
       std::lock_guard<std::mutex> lock(access_lock_);
       return is_eof_ && container_.empty();
     }
 
-    void set_eof()
-    {
+    void set_eof() {
       std::lock_guard<std::mutex> lock(access_lock_);
       is_eof_ = true;
     }
 
 
     //Copy Assignment
-    PipeQueue& operator=(const PipeQueue& other)
-    {
+    PipeQueue& operator=(const PipeQueue& other) {
       std::lock_guard<std::mutex> lock(access_lock_);
       container_ = other.container_;
       return *this;
     }
 
     //Move Assignment
-    PipeQueue& operator=(PipeQueue&& other)
-    {
+    PipeQueue& operator=(PipeQueue&& other) {
       std::lock_guard<std::mutex> lock(access_lock_);
       container_ = std::move(other.container_);
       return *this;
     }
 
-    bool operator<(PipeQueue& other)
-    {
+    bool operator<(PipeQueue& other) {
       std::lock_guard<std::mutex> lock(access_lock_);
       if (container_.size() < other.size())
         return true;
@@ -141,14 +122,12 @@ namespace PLS
         return false;
     }
 
-    bool operator==(PipeQueue& other)
-    {
+    bool operator==(PipeQueue& other) {
       std::lock_guard<std::mutex> lock(access_lock_);
       return container_ == other.container_;
     }
 
-    bool operator!=(PipeQueue& other)
-    {
+    bool operator!=(PipeQueue& other) {
       std::lock_guard<std::mutex> lock(access_lock_);
       return container_ != other.container_;
     }
@@ -163,16 +142,14 @@ namespace PLS
   };
 
   template<typename H>
-  PipeQueue<H>& operator<<(PipeQueue<H>&  pipe, H&& input)
-  {
+  PipeQueue<H>& operator<<(PipeQueue<H>&  pipe, H&& input) {
     pipe.push(std::move(input));
     return pipe;
   }
 
 
   template<typename H>
-  H& operator>>(PipeQueue<H>& pipe, H& output)
-  {
+  H& operator>>(PipeQueue<H>& pipe, H& output) {
     pipe.try_pop(output);
     return output;
   }
