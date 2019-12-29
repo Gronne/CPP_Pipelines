@@ -142,7 +142,7 @@ namespace PLS
 
 
     template<typename H>
-    friend H& operator>>(PipeQueue<H>& pipe, H& output);
+    friend bool operator>>(PipeQueue<H>& pipe, H& output);
     
   };
 
@@ -154,9 +154,8 @@ namespace PLS
 
 
   template<typename H>
-  H& operator>>(PipeQueue<H>& pipe, H& output) {
-    pipe.try_pop(output);
-    return output;
+  bool operator>>(PipeQueue<H>& pipe, H& output) {
+    return pipe.try_pop(output);
   }
   
 }

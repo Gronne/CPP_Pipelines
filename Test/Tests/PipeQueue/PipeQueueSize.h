@@ -11,11 +11,7 @@ TEST(PipeQueueTestSize, size_0)
 
 TEST(PipeQueueTestSize, size_many)
 {
-    PLS::PipeQueue<int> pipe;
-    pipe.push(1);
-    pipe.push(1);
-    pipe.push(1);
-    pipe.push(1);
+    PLS::PipeQueue<int> pipe = {1, 2, 3, 4};
     
     ASSERT_NO_THROW(pipe.size());
     ASSERT_EQ(pipe.size(), 4);
@@ -25,37 +21,37 @@ TEST(PipeQueueTestSize, size_many)
 TEST(PipeQueueTestSize, size_pop_to_zero)
 {
     PLS::PipeQueue<int> pipe;
+    int buffer;
 
     pipe.push(1);
     ASSERT_EQ(pipe.size(), 1);
 
-    pipe.pop();
+    pipe.try_pop(buffer);
     ASSERT_EQ(pipe.size(), 0);
 }
 
 
 TEST(PipeQueueTestSize, size_pop_to_less)
 {
-    PLS::PipeQueue<int> pipe;
+    PLS::PipeQueue<int> pipe = {1, 2};
+    int buffer;
 
-    pipe.push(1);
-    pipe.push(1);
     ASSERT_EQ(pipe.size(), 2);
 
-    pipe.pop();
+    pipe.try_pop(buffer);
     ASSERT_EQ(pipe.size(), 1);
 }
 
 
 TEST(PipeQueueTestSize, size_minus_zero)
 {
-    PLS::PipeQueue<int> pipe;
+    PLS::PipeQueue<int> pipe = {1};
+    int buffer;
 
-    pipe.push(1);
     ASSERT_EQ(pipe.size(), 1);
 
-    pipe.pop();
-    ASSERT_THROW(pipe.pop(), std::exception);
+    pipe.try_pop(buffer);
+    pipe.try_pop(buffer);
 
     ASSERT_EQ(pipe.size(), 0);
 }

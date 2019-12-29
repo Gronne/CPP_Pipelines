@@ -29,9 +29,7 @@ TEST(PipeQueueTestInit, init_type_string)
 
 TEST(PipeQueueTestInit, init_type_custom)
 {
-    struct CustomType {
-        
-    };
+    struct CustomType { };
 
     ASSERT_NO_THROW(PLS::PipeQueue<CustomType> testQueue);
 }
@@ -46,19 +44,16 @@ TEST(PipeQueueTestInit, init_copy_no_data)
 
 TEST(PipeQueueTestInit, init_copy_data)
 {
-    PLS::PipeQueue<int> copyQueue;      //Remember to test a different type in push
-    copyQueue.push(1);
-    copyQueue.push(2);
-    copyQueue.push(3);
+    PLS::PipeQueue<int> copyQueue = {1, 2, 3};
 
     ASSERT_NO_THROW(PLS::PipeQueue<int> testQueue(copyQueue));
-
     PLS::PipeQueue<int> testQueue2(copyQueue);
 
-    ASSERT_EQ(testQueue2.size(), copyQueue.size());
+    ASSERT_TRUE(testQueue2 == copyQueue);
 
-    testQueue2.pop();
-    ASSERT_NE(testQueue2.size(), copyQueue.size());
+    int buffer;
+    testQueue2.try_pop(buffer);
+    ASSERT_FALSE(testQueue2 == copyQueue);
 }
 
 
@@ -71,10 +66,7 @@ TEST(PipeQueueTestInit, init_move_no_data)
 
 TEST(PipeQueueTestInit, init_move_data_no_error)
 {
-    PLS::PipeQueue<int> moveQueue;      
-    moveQueue.push(1);
-    moveQueue.push(2);
-    moveQueue.push(3);
+    PLS::PipeQueue<int> moveQueue = {1, 2, 3};
 
     ASSERT_NO_THROW(PLS::PipeQueue<int> testQueue(std::move(moveQueue)));
 }
@@ -82,15 +74,44 @@ TEST(PipeQueueTestInit, init_move_data_no_error)
 
 TEST(PipeQueueTestInit, init_move_data_correct)
 {
-    PLS::PipeQueue<int> moveQueue;      
-    moveQueue.push(1);
-    moveQueue.push(2);
-    moveQueue.push(3);
+    PLS::PipeQueue<int> moveQueue = {1, 2, 3};
 
     PLS::PipeQueue<int> testQueue(std::move(moveQueue));
 
     ASSERT_EQ(testQueue.size(), 3);
     ASSERT_EQ(moveQueue.size(), 0);
+}
+
+
+TEST(PipeQueueTestInit, init_initializeList_one) 
+{
+    PLS::PipeQueue<int> pipe = {1};
+
+    ASSERT_EQ(pipe.size(), 1);
+
+    int buffer;
+    pipe.try_pop(buffer);
+
+    ASSERT_EQ(buffer, 1);
+}
+
+
+TEST(PipeQueueTestInit, init_initializeList_many) 
+{
+    PLS::PipeQueue<int> pipe = {1, 2, 3};
+
+    ASSERT_EQ(pipe.size(), 3);
+
+    int buffer;
+
+    pipe.try_pop(buffer);
+    ASSERT_EQ(buffer, 1);
+
+    pipe.try_pop(buffer);
+    ASSERT_EQ(buffer, 2);
+
+    pipe.try_pop(buffer);
+    ASSERT_EQ(buffer, 3);
 }
 
 
