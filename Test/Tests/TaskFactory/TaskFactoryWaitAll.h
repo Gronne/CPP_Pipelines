@@ -27,9 +27,7 @@ TEST(TaskFactoryTestWaitAll, wait_multiple_tasks)
 
     PLS::PipeQueue<int> pipeIn, pipeOut;
 
-    std::future<void> f1;
-    std::future<void> f2;
-    std::future<void> f3;
+    std::future<void> f1, f2, f3;
 
     ASSERT_NO_THROW(f1 = PLS::TaskFactory::start_async_task(lambdaFunction, pipeIn, pipeOut));
     ASSERT_NO_THROW(f2 = PLS::TaskFactory::start_async_task(lambdaFunction, pipeIn, pipeOut));
