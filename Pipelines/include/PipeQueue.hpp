@@ -72,6 +72,22 @@ namespace PLS
       std::lock_guard<std::mutex> lock(access_lock_);
       return container_.size();
     }
+
+    bool operator<(PipeQueue& other)
+    {
+      std::lock_guard<std::mutex> lock(access_lock_);
+      if (container_.size() < other.size())
+        return true;
+      else
+        return false;
+    }
+
+    template<typename H>
+    friend PipeQueue<H>& operator<<(PipeQueue<H>& pipe, H&& input);
+
+
+    template<typename H>
+    friend H& operator>>(PipeQueue<H>& pipe, H& output);
     
     
     void push(T&& value) {
@@ -121,4 +137,21 @@ namespace PLS
       is_eof_ = true;
     }
   };
+
+  template<typename H>
+  PipeQueue<H>& operator<<(PipeQueue<H>&  pipe, H&& input)
+  {
+    pipe.push_back(std::move(input));
+    return pipe;
+  }
+
+
+  template<typename H>
+  H& operator>>(PipeQueue<H>& pipe, H& output)
+  {
+    output = pipe.front();
+    pipe.pop_front();
+    return output;
+  }
+  
 }
