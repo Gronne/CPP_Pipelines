@@ -87,6 +87,11 @@ namespace PLS
       container_.pop_front();
       return true;
     }
+    
+    void swap(PipeQueue& other)
+    {
+      container_.swap(other.container_);
+    }
 
     // Can
     bool eof() const {
