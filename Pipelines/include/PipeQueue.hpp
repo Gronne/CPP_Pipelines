@@ -41,7 +41,7 @@ namespace PLS
 
     //Copy Constructer
     PipeQueue(const PipeQueue &other) {
-      std::lock_gsuard<std::mutex> lock(access_lock_);
+      std::lock_guard<std::mutex> lock(access_lock_);
       container_ = other.container_;
     }
 
@@ -90,6 +90,7 @@ namespace PLS
     
     void swap(PipeQueue& other)
     {
+      std::lock_guard<std::mutex> lock(access_lock_);
       container_.swap(other.container_);
     }
 
