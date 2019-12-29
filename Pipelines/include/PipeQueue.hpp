@@ -20,27 +20,6 @@
 
 namespace PLS
 {
-
-// namespace PipeQueue
-// {
-// namespace Traits
-// {
-//   //SFINAE check for function has_wait
-//   template<typename T, typename = void>
-//   struct has_wait : std::false_type { };
-
-//   template<typename T>
-//   struct has_wait<T, std::void_t<decltype(std::declval<T>().wait())> > : std::true_type { };
-  
-
-//   template<typename >
-//   using is_same = std::conjunction<has_wait<Args>...>;
-// }
-// }
-
-
-
-
   template<typename T, typename Container = std::deque<T>>
   class PipeQueue
   {
@@ -49,7 +28,7 @@ namespace PLS
     std::mutex access_lock_;
     bool is_eof_;
   public:
-    PipeQueue() : container_()
+    PipeQueue() : container_(), is_eof_(false)
     {
       static_assert(std::is_same<T, typename Container::value_type>::value, "T and value type of container is not the same");
       // static_assert(container_implements<)
@@ -95,25 +74,25 @@ namespace PLS
     }
     
     
-    void push_back(T&& value) {
+    void push(T&& value) {
       std::lock_guard<std::mutex> lock(access_lock_); // RIIA style lock for current scope
       container_.push_back(std::move(value));
     }
 
-    void push_back(const T & value) {
+    void push(const T & value) {
       container_.push_back(value);
     }
 
-    T &&front() {
-      std::lock_guard<std::mutex> lock(access_lock_);
-      return std::move(container_.front());
+    const T& front()
+    {
+      return container_.front();
     }
 
-    // Can be moved to cpp file
-    void pop_front()
-    {
+    T pop() {
       std::lock_guard<std::mutex> lock(access_lock_);
+      T t = std::move(container_.front());
       container_.pop_front();
+      return t;
     }
 
     bool empty() 

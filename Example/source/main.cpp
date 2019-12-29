@@ -12,24 +12,22 @@ using namespace PLS;
 
 void readFile(string& path, PipeQueue<string>& out)
 {
-  cout << "readFile: path: "<< path << endl;
+  cout << "readFile: path: "<< path << endl << flush;
   ifstream input(path);
-  int i = 0;
   if(input.is_open())
   {
     while (!input.eof())
     {
       string line;
       getline(input, line);
-      out.push_back(std::move(line));
-      if(++i%1000 == 0)
-        cout << "readFile count: " << i << endl;
+      out.push(std::move(line));
     }
   }
   else
   {
-    cout << "failed to open " << path << endl;
+    cout << "failed to open " << path << endl << flush;
   }
+  cout << "Done reading files" << endl << flush;
   out.set_eof(); 
 }
 
@@ -40,18 +38,17 @@ int main()
   map<string, PipeQueue<string>> map;
 
   decltype(auto) lambda = [](PipeQueue<string>& in, PipeQueue<string>& out) {
-    int i = 0;
+    cout << "Started to read words" << endl << flush;
     while(!in.eof())
     {
-      stringstream line(in.front());
+      stringstream line(in.pop());
       string word;
-      in.pop_front();
       
       while (line >> word)
-        out.push_back(std::move(word));
-      if(++i%10000 == 0)
-        cout << "Lines read in lambda: " << i << endl;
+        out.push(std::move(word));
+        
     }
+  cout << "Done reading words" << endl << flush;
     out.set_eof();
   };
 
@@ -65,34 +62,37 @@ int main()
   cout << "Starting to map words" << endl;
   
   // TODO: DOES NOT WORK YET
-  auto f3 = TaskFactory::start_async_task([](PipeQueue<string> &in, std::map<string, PipeQueue<string>> &map){
-    while(!in.eof())
-    {
-      string word(in.front());
-      in.pop_front();
+  // auto f3 = TaskFactory::start_async_task([](PipeQueue<string> &in, std::map<string, PipeQueue<string>> &map){
+  //   cout << "Started to map words " << endl << flush;
+  //   while(!in.eof())
+  //   {
+  //     string word(in.pop());
       
-      auto temp = map.find(word);
-      if(map.end() != temp)
-      {
-        temp->second.push_back(word);
-        map.insert_or_assign(temp->second.front(), temp->second);
-      }
-      else
-      {
-        PipeQueue<string> q;
-        q.push_back(word);
-        map.insert_or_assign(q.front(), q);
-      }
-    }
-    cout << "Mapping done" << endl;
-  },
-  words,
-  map);
+  //     auto temp = map.find(word);
+  //     if(map.end() != temp)
+  //     {
+  //       temp->second.push(word);
+  //       map.insert_or_assign(temp->second.front(), temp->second);
+  //     }
+  //     else
+  //     {
+  //       PipeQueue<string> q;
+  //       q.push(word);
+  //       map.insert_or_assign(q.front(), q);
+  //     }
+  //   }
+  //   cout << "Mapping done" << endl;
+  // },
+  // words,
+  // map);
 
   cout << "Waiting for all end" << endl;
 
-  auto t = map.find("why");
-  cout << "Word why count: " << t->second.size() << endl;
+  TaskFactory::wait_all(f1, f2);
+
+  cout << "wait_all done" << endl;
+  //auto t = map.find("alone");
+  //cout << "Word why count: " << t->second.size() << endl;
 
   //PipeQueue<string, std::vector<int>> test; // Test that another type in the vec
 }
