@@ -38,6 +38,13 @@ namespace PLS
       // May be omitted
     }
 
+    //Initialization Constructor
+    PipeQueue(std::initializer_list<T> t_list) : PipeQueue()
+    {
+      for(auto &t : t_list)
+        push(t);
+    }
+
     //Copy Constructer
     PipeQueue(const PipeQueue &other)
     {
@@ -144,7 +151,7 @@ namespace PLS
   template<typename H>
   PipeQueue<H>& operator<<(PipeQueue<H>&  pipe, H&& input)
   {
-    pipe.push_back(std::move(input));
+    pipe.push(std::move(input));
     return pipe;
   }
 
@@ -152,8 +159,7 @@ namespace PLS
   template<typename H>
   H& operator>>(PipeQueue<H>& pipe, H& output)
   {
-    output = pipe.front();
-    pipe.pop_front();
+    pipe.try_pop(output);
     return output;
   }
   
