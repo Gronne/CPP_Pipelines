@@ -91,24 +91,27 @@ namespace PLS
     
     
     void push(T&& value) {
-      std::lock_guard<std::mutex> lock(access_lock_); // RIIA style lock for current scope
+      std::lock_guard<std::mutex> lock(access_lock_);
       container_.push_back(std::move(value));
     }
 
     void push(const T & value) {
+      std::lock_guard<std::mutex> lock(access_lock_);
       container_.push_back(value);
     }
 
-    const T& front()
+    const T& unsafe_front()
     {
       return container_.front();
     }
 
-    T pop() {
+    bool try_pop(T & t) {
       std::lock_guard<std::mutex> lock(access_lock_);
-      T t = std::move(container_.front());
+      if(container_.empty())
+        return false;
+      t = std::move(container_.front());
       container_.pop_front();
-      return t;
+      return true;
     }
 
     bool empty() 
