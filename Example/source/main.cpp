@@ -5,6 +5,9 @@
 #include "PipeQueue.hpp"
 #include "TaskFactory.hpp"
 #include <map>
+#include <regex>
+#include <iterator>
+
 
 
 using namespace std;
@@ -49,6 +52,8 @@ int main()
       stringstream lineStream(line);
       string word;
       
+      regex words_regex("");
+
       while (lineStream >> word)
         out.push(std::move(word));
         
