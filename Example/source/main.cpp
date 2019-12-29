@@ -9,6 +9,8 @@
 #include <iterator>
 #include <thread>
 #include <chrono>
+#include <cctype>
+#include <algorithm>
 
 
 using namespace std;
@@ -35,6 +37,8 @@ void readFile(string& path, PipeQueue<string>& out)
   out.set_eof(); 
 }
 
+
+
 int main()
 {
   //std::cout << "Hello world!" << std::endl;
@@ -50,24 +54,26 @@ int main()
 
       if(!in.try_pop(line))
       {
-        std::cout << "No item in 'in'" << endl << flush;
-        this_thread::sleep_for(chrono::seconds(1));
+        this_thread::sleep_for(chrono::milliseconds(2));
         continue;
       }
-      cout << line << endl << flush;
       
       // Find words in line. Ignore non-word characters
       // https://en.cppreference.com/w/cpp/regex
-      std::regex re("(\\w+))", std::regex_constants::ECMAScript);
-      this_thread::sleep_for(chrono::seconds(1));
-      auto words_begin = 
-        sregex_iterator(line.begin(), line.end(), re);
+      std::regex re("(\\w+)", std::regex_constants::ECMAScript);
+      auto words_begin = sregex_iterator(line.begin(), line.end(), re);
       auto words_end = sregex_iterator();
 
       for (sregex_iterator i = words_begin; i != words_end; ++i) {
-          smatch match = *i;
-          cout << match.str() << flush;
-          out.push(match.str());
+          string match = (*i).str();
+          // algorithm 
+          // https://en.cppreference.com/w/cpp/string/byte/tolower
+          transform(match.begin(), 
+                    match.end(), 
+                    match.begin(), 
+                    [](unsigned char c){ return tolower(c); }
+                   );
+          out.push(std::move(match));
       }
     }
     cout << "Done reading words" << endl << flush;
@@ -83,14 +89,17 @@ int main()
   future<void> f2 = TaskFactory::start_async_task(lambda, lines, words); // Test with lambda
   cout << "Starting to map words" << endl;
   
-  // TODO: DOES NOT WORK YET
+
   auto f3 = TaskFactory::start_async_task([](PipeQueue<string> &in, std::map<string, PipeQueue<string>> &map){
     cout << "Started to map words " << endl << flush;
     while(!in.eof())
     {
       string word;
       if(!in.try_pop(word))
+      {
+        this_thread::sleep_for(chrono::milliseconds(2));
         continue;
+      }
       
       auto temp = map.find(word);
       if(map.end() != temp)
@@ -115,8 +124,8 @@ int main()
   TaskFactory::wait_all(f1, f2, f3);
 
   cout << "wait_all done" << endl;
-  auto t = map.find("alone.");
-  cout << "Word 'alone' count: " << t->second.size() << endl;
+  auto t = map.find("alone");
+  cout << "Word 'Alone' count: " << t->second.size() << endl;
 
   //PipeQueue<string, std::vector<int>> test; // Test that another type in the vec
 }
