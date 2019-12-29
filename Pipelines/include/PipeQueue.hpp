@@ -90,6 +90,7 @@ namespace PLS
     }
 
     const ssize_t size() {
+      std::lock_guard<std::mutex> lock(access_lock_);
       return container_.size();
     }
     
@@ -115,14 +116,29 @@ namespace PLS
       container_.pop_front();
     }
 
+    bool empty() 
+    {
+      std::lock_guard<std::mutex> lock(access_lock_);
+      return container_.empty();
+    }
+
+    void clear()
+    {
+      std::lock_guard<std::mutex> lock(access_lock_);
+      container_.clear();
+    }
+
+
     // Can
     bool eof()
     {
+      std::lock_guard<std::mutex> lock(access_lock_);
       return is_eof_ && container_.empty();
     }
 
     void set_eof()
     {
+      std::lock_guard<std::mutex> lock(access_lock_);
       is_eof_ = true;
     }
   };
