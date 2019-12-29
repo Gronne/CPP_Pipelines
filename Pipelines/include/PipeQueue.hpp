@@ -134,7 +134,7 @@ namespace PLS
 
     bool operator!=(PipeQueue& other) {
       std::lock_guard<std::mutex> lock(access_lock_);
-      return container_ != other.container_;
+      return (container_ == other.container_) == false;
     }
 
     template<typename H>
