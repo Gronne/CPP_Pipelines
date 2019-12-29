@@ -140,6 +140,8 @@ namespace PLS
     template<typename H>
     friend PipeQueue<H>& operator<<(PipeQueue<H>& pipe, H&& input);
 
+    template<typename H>
+    friend PipeQueue<H>& operator<<(PipeQueue<H>& pipe, H& input);
 
     template<typename H>
     friend bool operator>>(PipeQueue<H>& pipe, H& output);
@@ -149,6 +151,13 @@ namespace PLS
   template<typename H>
   PipeQueue<H>& operator<<(PipeQueue<H>&  pipe, H&& input) {
     pipe.push(std::move(input));
+    return pipe;
+  }
+
+
+  template<typename H>
+  PipeQueue<H>& operator<<(PipeQueue<H>&  pipe, H& input) {
+    pipe.push(input);
     return pipe;
   }
 
