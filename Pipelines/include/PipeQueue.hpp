@@ -88,14 +88,13 @@ namespace PLS
       return true;
     }
     
-    void swap(PipeQueue& other)
-    {
+    void swap(PipeQueue& other) {
       std::lock_guard<std::mutex> lock(access_lock_);
       container_.swap(other.container_);
     }
 
     // Can
-    bool eof() const {
+    bool eof() {
       std::lock_guard<std::mutex> lock(access_lock_);
       return is_eof_ && container_.empty();
     }
