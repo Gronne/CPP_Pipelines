@@ -38,6 +38,13 @@ namespace PLS
       // May be omitted
     }
 
+    //Initialization Constructor
+    PipeQueue(std::initializer_list<T> t_list) : PipeQueue()
+    {
+      for(auto &t : t_list)
+        push(t);
+    }
+
     //Copy Constructer
     PipeQueue(const PipeQueue &other)
     {
@@ -52,44 +59,25 @@ namespace PLS
       container_ = std::move(other.container_);
     }
 
-    //Copy Assignment
-    PipeQueue& operator=(const PipeQueue& other)
-    {
-      std::lock_guard<std::mutex> lock(access_lock_);
-      container_ = other.container_;
-      return *this;
-    }
-
-    //Move Assignment
-    PipeQueue& operator=(PipeQueue&& other)
-    {
-      std::lock_guard<std::mutex> lock(access_lock_);
-      container_ = std::move(other.container_);
-      return *this;
-    }
 
     const ssize_t size() {
       std::lock_guard<std::mutex> lock(access_lock_);
       return container_.size();
     }
 
-    bool operator<(PipeQueue& other)
+    bool empty() 
     {
       std::lock_guard<std::mutex> lock(access_lock_);
-      if (container_.size() < other.size())
-        return true;
-      else
-        return false;
+      return container_.empty();
     }
 
-    template<typename H>
-    friend PipeQueue<H>& operator<<(PipeQueue<H>& pipe, H&& input);
+    void clear()
+    {
+      std::lock_guard<std::mutex> lock(access_lock_);
+      container_.clear();
+    }
 
 
-    template<typename H>
-    friend H& operator>>(PipeQueue<H>& pipe, H& output);
-    
-    
     void push(T&& value) {
       std::lock_guard<std::mutex> lock(access_lock_);
       container_.push_back(std::move(value));
@@ -114,19 +102,6 @@ namespace PLS
       return true;
     }
 
-    bool empty() 
-    {
-      std::lock_guard<std::mutex> lock(access_lock_);
-      return container_.empty();
-    }
-
-    void clear()
-    {
-      std::lock_guard<std::mutex> lock(access_lock_);
-      container_.clear();
-    }
-
-
     // Can
     bool eof()
     {
@@ -139,12 +114,58 @@ namespace PLS
       std::lock_guard<std::mutex> lock(access_lock_);
       is_eof_ = true;
     }
+
+
+    //Copy Assignment
+    PipeQueue& operator=(const PipeQueue& other)
+    {
+      std::lock_guard<std::mutex> lock(access_lock_);
+      container_ = other.container_;
+      return *this;
+    }
+
+    //Move Assignment
+    PipeQueue& operator=(PipeQueue&& other)
+    {
+      std::lock_guard<std::mutex> lock(access_lock_);
+      container_ = std::move(other.container_);
+      return *this;
+    }
+
+    bool operator<(PipeQueue& other)
+    {
+      std::lock_guard<std::mutex> lock(access_lock_);
+      if (container_.size() < other.size())
+        return true;
+      else
+        return false;
+    }
+
+    bool operator==(PipeQueue& other)
+    {
+      std::lock_guard<std::mutex> lock(access_lock_);
+      return container_ == other.container_;
+    }
+
+    bool operator!=(PipeQueue& other)
+    {
+      std::lock_guard<std::mutex> lock(access_lock_);
+      return container_ != other.container_;
+    }
+
+    template<typename H>
+    friend PipeQueue<H>& operator<<(PipeQueue<H>& pipe, H&& input);
+
+
+    template<typename H>
+    friend H& operator>>(PipeQueue<H>& pipe, H& output);
+    
   };
 
   template<typename H>
   PipeQueue<H>& operator<<(PipeQueue<H>&  pipe, H&& input)
   {
-    pipe.push_back(std::move(input));
+    pipe.push(std::move(input));
     return pipe;
   }
 
@@ -152,8 +173,7 @@ namespace PLS
   template<typename H>
   H& operator>>(PipeQueue<H>& pipe, H& output)
   {
-    output = pipe.front();
-    pipe.pop_front();
+    pipe.try_pop(output);
     return output;
   }
   

@@ -46,10 +46,10 @@ TEST(PipeQueueTestInit, init_copy_no_data)
 
 TEST(PipeQueueTestInit, init_copy_data)
 {
-    PLS::PipeQueue<int> copyQueue;      //Remember to test a different type in push_back
-    copyQueue.push_back(1);
-    copyQueue.push_back(2);
-    copyQueue.push_back(3);
+    PLS::PipeQueue<int> copyQueue;      //Remember to test a different type in push
+    copyQueue.push(1);
+    copyQueue.push(2);
+    copyQueue.push(3);
 
     ASSERT_NO_THROW(PLS::PipeQueue<int> testQueue(copyQueue));
 
@@ -57,7 +57,7 @@ TEST(PipeQueueTestInit, init_copy_data)
 
     ASSERT_EQ(testQueue2.size(), copyQueue.size());
 
-    testQueue2.pop_front();
+    testQueue2.pop();
     ASSERT_NE(testQueue2.size(), copyQueue.size());
 }
 
@@ -72,9 +72,9 @@ TEST(PipeQueueTestInit, init_move_no_data)
 TEST(PipeQueueTestInit, init_move_data_no_error)
 {
     PLS::PipeQueue<int> moveQueue;      
-    moveQueue.push_back(1);
-    moveQueue.push_back(2);
-    moveQueue.push_back(3);
+    moveQueue.push(1);
+    moveQueue.push(2);
+    moveQueue.push(3);
 
     ASSERT_NO_THROW(PLS::PipeQueue<int> testQueue(std::move(moveQueue)));
 }
@@ -83,9 +83,9 @@ TEST(PipeQueueTestInit, init_move_data_no_error)
 TEST(PipeQueueTestInit, init_move_data_correct)
 {
     PLS::PipeQueue<int> moveQueue;      
-    moveQueue.push_back(1);
-    moveQueue.push_back(2);
-    moveQueue.push_back(3);
+    moveQueue.push(1);
+    moveQueue.push(2);
+    moveQueue.push(3);
 
     PLS::PipeQueue<int> testQueue(std::move(moveQueue));
 
