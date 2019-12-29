@@ -21,7 +21,7 @@ TEST(TaskFactoryTestFlow, flow_one_task)
     pipeIn.push_back(3);
 
     std::future<void> f;
-    ASSERT_NO_THROW(f = PLS::TaskFactory::startAsyncTask(lambdaFunction, pipeIn, pipeOut));
+    ASSERT_NO_THROW(f = PLS::TaskFactory::start_async_task(lambdaFunction, pipeIn, pipeOut));
     ASSERT_NO_THROW(PLS::TaskFactory::wait_all(f));
 
 
@@ -57,8 +57,8 @@ TEST(TaskFactoryTestFlow, flow_two_tasks)
     std::future<void> f1;
     std::future<void> f2;
 
-    ASSERT_NO_THROW(f1 = PLS::TaskFactory::startAsyncTask(lambdaFunction, pipeIn, pipeOut1));
-    ASSERT_NO_THROW(f2 = PLS::TaskFactory::startAsyncTask(lambdaFunction, pipeOut1, pipeOut2));
+    ASSERT_NO_THROW(f1 = PLS::TaskFactory::start_async_task(lambdaFunction, pipeIn, pipeOut1));
+    ASSERT_NO_THROW(f2 = PLS::TaskFactory::start_async_task(lambdaFunction, pipeOut1, pipeOut2));
     ASSERT_NO_THROW(PLS::TaskFactory::wait_all(f1, f2));
 
     ASSERT_EQ(pipeOut2.size(), 3);       //== will make this easier
@@ -94,8 +94,8 @@ TEST(TaskFactoryTestFlow, flow_two_tasks_one_inputPipe)
     std::future<void> f1;
     std::future<void> f2;
 
-    ASSERT_NO_THROW(f1 = PLS::TaskFactory::startAsyncTask(lambdaFunction, pipeIn, pipeOut1));
-    ASSERT_NO_THROW(f2 = PLS::TaskFactory::startAsyncTask(lambdaFunction, pipeIn, pipeOut2));
+    ASSERT_NO_THROW(f1 = PLS::TaskFactory::start_async_task(lambdaFunction, pipeIn, pipeOut1));
+    ASSERT_NO_THROW(f2 = PLS::TaskFactory::start_async_task(lambdaFunction, pipeIn, pipeOut2));
     ASSERT_NO_THROW(PLS::TaskFactory::wait_all(f1, f2));
 
     ASSERT_EQ(pipeOut1.size() + pipeOut2.size(), 4);
@@ -125,7 +125,7 @@ TEST(TaskFactoryTestFlow, flow_one_tasks_two_pipes)
     pipeIn.push_back(3);
 
     std::future<void> f;
-    ASSERT_NO_THROW(f = PLS::TaskFactory::startAsyncTask(lambdaFunction, pipeIn, pipeOut1, pipeOut2));
+    ASSERT_NO_THROW(f = PLS::TaskFactory::start_async_task(lambdaFunction, pipeIn, pipeOut1, pipeOut2));
     ASSERT_NO_THROW(PLS::TaskFactory::wait_all(f));
 
     ASSERT_EQ(pipeOut1.size(), 3);  
