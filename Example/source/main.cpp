@@ -7,7 +7,8 @@
 #include <map>
 #include <regex>
 #include <iterator>
-
+#include <thread>
+#include <chrono>
 
 
 using namespace std;
@@ -41,24 +42,35 @@ int main()
   map<string, PipeQueue<string>> map;
 
   decltype(auto) lambda = [](PipeQueue<string>& in, PipeQueue<string>& out) {
+    
     cout << "Started to read words" << endl << flush;
     while(!in.eof())
     {
       string line;
 
-      if(false == in.try_pop(line))
+      if(!in.try_pop(line))
+      {
+        std::cout << "No item in 'in'" << endl << flush;
+        this_thread::sleep_for(chrono::seconds(1));
         continue;
-
-      stringstream lineStream(line);
-      string word;
+      }
+      cout << line << endl << flush;
       
-      regex words_regex("");
+      // Find words in line. Ignore non-word characters
+      // https://en.cppreference.com/w/cpp/regex
+      std::regex re("(\\w+))", std::regex_constants::ECMAScript);
+      this_thread::sleep_for(chrono::seconds(1));
+      auto words_begin = 
+        sregex_iterator(line.begin(), line.end(), re);
+      auto words_end = sregex_iterator();
 
-      while (lineStream >> word)
-        out.push(std::move(word));
-        
+      for (sregex_iterator i = words_begin; i != words_end; ++i) {
+          smatch match = *i;
+          cout << match.str() << flush;
+          out.push(match.str());
+      }
     }
-  cout << "Done reading words" << endl << flush;
+    cout << "Done reading words" << endl << flush;
     out.set_eof();
   };
 
