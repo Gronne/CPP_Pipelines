@@ -37,10 +37,18 @@ void readFile(string& path, PipeQueue<string>& out)
   out.set_eof(); 
 }
 
-
-
-int main()
+//Functor example
+struct ReduceFunctor
 {
+  void operator()(map<string, vector<string>> &in, map<string, int> &out) {
+    for_each(in.begin(), in.end(), [&out](tuple<string, vector<string>> pair){
+      // accumelate vector in pair
+      // insert new pair with pair key as key and accumelate result as value into out
+    });
+  }
+};
+
+int main() {
   //std::cout << "Hello world!" << std::endl;
   PipeQueue<string> lines, words;
   map<string, PipeQueue<string>> map;
@@ -118,6 +126,7 @@ int main()
   },
   words,
   map);
+  //todo create future for ReduceFunctor
 
   cout << "Waiting for all end" << endl;
 
