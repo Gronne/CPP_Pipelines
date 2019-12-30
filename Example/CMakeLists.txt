@@ -4,7 +4,7 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -g")
 
-include_directories(../Pipelines/include)
+include_directories(../Pipelines/include include)
 SET(SOURCE_FILES source/main.cpp)
 
 

@@ -12,6 +12,7 @@
 
 #include "PipeQueue.hpp"
 #include "TaskFactory.hpp"
+#include "MapWriter.hpp"
 
 
 
@@ -63,8 +64,6 @@ struct MapReduceFunctor
     std::cout << "Mapping done" << std::endl;
   }
 };
-
-
 
 
 int main(int argc, char *argv[]) {
@@ -130,15 +129,16 @@ int main(int argc, char *argv[]) {
 
   std::cout << "Starting to map and reduce words" << std::endl;
   auto f3 = PLS::TaskFactory::start_async_task(MapReduceFunctor(), words, map);
-  //todo create std::future for ReduceFunctor
 
   std::cout << "Waiting for all end" << std::endl;
-
   PLS::TaskFactory::wait_all(f1, f2, f3);
 
-  std::cout << "wait_all done" << std::endl;
-  auto t = map.find("alone");
-  std::cout << "Word 'Alone' count: " << t->second << std::endl;
+  MapWriter map_writer("MapReducedBooks.txt");
+  map_writer.writeMap(map);
+
+  // std::cout << "wait_all done" << std::endl;
+  // auto t = map.find("alone");
+  // std::cout << "Word 'Alone' count: " << t->second << std::endl;
 
   //PLS::PipeQueue<std::string, std::vector<int>> test; // Test that another type in the vec
 }
