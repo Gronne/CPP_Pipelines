@@ -130,10 +130,7 @@ namespace PLS
 
     bool operator<(PipeQueue& other) {
       std::lock_guard<std::mutex> lock(access_lock_);
-      if (container_.size() < other.size())
-        return true;
-      else
-        return false;
+      return container_.size() < other.size();
     }
 
     bool operator==(PipeQueue& other) {
