@@ -22,22 +22,21 @@ namespace PLS {
   {
   public:
     template<typename T, typename...Args>
-    static void wait_all(T&& first, Args&& ...args)
+    static void wait_all(T&& awaitable, Args&& ...args)
     {
       static_assert(is_awaitable<Args...>::value, "Argument in TaskFactory::wait_all(...) does not implement the wait function");
-      first.wait();
+      awaitable.wait();
       wait_all(args...);
     }
 
 
     template<typename T>
-    static void wait_all(T&& future)
+    static void wait_all(T&& awaitable)
     {
-      future.wait();
+      awaitable.wait();
     }
 
-
-    template<class F, class... Args, typename R = std::result_of_t<std::decay_t<F>&&(Args...)>>
+    template<typename F, typename... Args, typename R = std::result_of_t<std::decay_t<F>&&(Args...)>>
     static std::future<R> start_async_task(F&& callable, Args&&... args)
     {
       std::future<R> task = std::async(std::launch::async, callable, std::ref(args)...); 
