@@ -83,23 +83,25 @@ int main() {
                     match.begin(), 
                     [](unsigned char c){ return tolower(c); }
                    );
-          out.push(std::move(match));
+
+          out << std::move(match);
       }
     }
+
     cout << "Done reading words" << endl << flush;
     out.set_eof();
   };
 
-  function f = lambda;
-  string filePath = "Example/Books/Dracula.txt";
+
+  string filePath = "Example/Books/Dracula.txt";      //Should this just be given as input to main?
 
   cout << "Starting to get lines" << endl;
   future<void> f1 = TaskFactory::start_async_task(readFile, filePath, lines); // Read lines from books
+
   cout << "Starting to get words" << endl;
   future<void> f2 = TaskFactory::start_async_task(lambda, lines, words); // Test with lambda
-  cout << "Starting to map words" << endl;
-  
 
+  cout << "Starting to map words" << endl;
   auto f3 = TaskFactory::start_async_task([](PipeQueue<string> &in, std::map<string, PipeQueue<string>> &map){
     cout << "Started to map words " << endl << flush;
     while(!in.eof())
