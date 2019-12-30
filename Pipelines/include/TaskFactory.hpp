@@ -34,7 +34,7 @@ namespace PLS {
       future.wait();
     }
 
-    template<class F, class... Args, typename R = std::result_of_t<std::decay_t<F>&&(Args...)>>
+    template<typename F, typename... Args, typename R = std::result_of_t<std::decay_t<F>&&(Args...)>>
     static std::future<R> start_async_task(F&& callable, Args&&... args)
     {
       std::future<R> task = std::async(std::launch::async, callable, std::ref(args)...); 
