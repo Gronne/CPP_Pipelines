@@ -8,16 +8,18 @@ TEST(TaskFactoryTestFlow, flow_one_task)
             int buffer;
             while(!in.eof())
             {
-                if(in.try_pop(buffer) == false)
+                if((in >> buffer) == false)
                     continue;
                 
-                out.push(buffer);
+                out << buffer;
             }
 
             out.set_eof();
         };
 
     PLS::PipeQueue<int> pipeIn = {1, 2, 3};
+    pipeIn.set_eof();
+
     PLS::PipeQueue<int> pipeOut;
 
     std::future<void> f;
@@ -37,16 +39,18 @@ TEST(TaskFactoryTestFlow, flow_two_tasks)
             int buffer;
             while(!in.eof())
             {
-                if(in.try_pop(buffer) == false)
+                if((in >> buffer) == false)
                     continue;
                 
-                out.push(buffer);
+                out << buffer;
             }
 
             out.set_eof();
         };
 
     PLS::PipeQueue<int> pipeIn = {1, 2, 3};
+    pipeIn.set_eof();
+
     PLS::PipeQueue<int> pipeOut1, pipeOut2;
 
     std::future<void> f1, f2;
@@ -67,16 +71,18 @@ TEST(TaskFactoryTestFlow, flow_two_tasks_one_inputPipe)
             int buffer;
             while(!in.eof())
             {
-                if(in.try_pop(buffer) == false)
+                if((in >> buffer) == false)
                     continue;
                 
-                out.push(buffer);
+                out << buffer;
             }
 
             out.set_eof();
         };
 
     PLS::PipeQueue<int> pipeIn = {1, 2, 3, 4};
+    pipeIn.set_eof();
+
     PLS::PipeQueue<int> pipeOut1, pipeOut2;
 
     std::future<void> f1, f2;
@@ -97,11 +103,11 @@ TEST(TaskFactoryTestFlow, flow_one_tasks_two_pipes)
             int buffer;
             while(!in.eof())
             {
-                if(in.try_pop(buffer) == false)
+                if((in >> buffer) == false)
                     continue;
 
-                ASSERT_NO_THROW(outA.push(buffer));
-                ASSERT_NO_THROW(outB.push(buffer));
+                ASSERT_NO_THROW(outA << buffer);
+                ASSERT_NO_THROW(outB << buffer);
             }
             
             outA.set_eof();
@@ -109,6 +115,8 @@ TEST(TaskFactoryTestFlow, flow_one_tasks_two_pipes)
         };
 
     PLS::PipeQueue<int> pipeIn = {1, 2, 3};
+    pipeIn.set_eof();
+
     PLS::PipeQueue<int> pipeOut1, pipeOut2;
 
     std::future<void> f;

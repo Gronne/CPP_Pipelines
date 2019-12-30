@@ -11,10 +11,11 @@ namespace PLS {
 
   template<typename T>
   struct has_wait<T, std::void_t<decltype(std::declval<T>().wait())> > : std::true_type { };
-  
 
   template<typename... Args>
   using is_awaitable = std::conjunction<has_wait<Args>...>;
+
+
 
 
   class TaskFactory
@@ -27,6 +28,7 @@ namespace PLS {
       first.wait();
       wait_all(args...);
     }
+
 
     template<typename T>
     static void wait_all(T&& future)

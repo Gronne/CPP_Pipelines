@@ -1,6 +1,6 @@
 #include "../ClassHeader.h"
 
-TEST(PipeQueueTestAssignment, assignment_copy_noData_noData)
+TEST(PipeQueueTestAssignmentMoveCopy, copy_noData_noData)
 {
     PLS::PipeQueue<int> testQueue;
     PLS::PipeQueue<int> copyQueue;
@@ -9,7 +9,7 @@ TEST(PipeQueueTestAssignment, assignment_copy_noData_noData)
 }
 
 
-TEST(PipeQueueTestAssignment, assignment_copy_noData_data)
+TEST(PipeQueueTestAssignmentMoveCopy, copy_noData_data)
 {
     PLS::PipeQueue<int> copyQueue = {1, 2, 3};
     PLS::PipeQueue<int> testQueue;
@@ -23,7 +23,7 @@ TEST(PipeQueueTestAssignment, assignment_copy_noData_data)
     ASSERT_FALSE(testQueue == copyQueue);
 }
 
-TEST(PipeQueueTestAssignment, assignment_copy_data_data)
+TEST(PipeQueueTestAssignmentMoveCopy, copy_data_data)
 {
     PLS::PipeQueue<int> testQueue = { 5, 6, 7, 8};
     PLS::PipeQueue<int> copyQueue = { 1, 2, 3};
@@ -38,7 +38,7 @@ TEST(PipeQueueTestAssignment, assignment_copy_data_data)
 }
 
 
-TEST(PipeQueueTestAssignment, assignment_move_noData_noData)
+TEST(PipeQueueTestAssignmentMoveCopy, move_noData_noData)
 {
     PLS::PipeQueue<int> testQueue;
     PLS::PipeQueue<int> moveQueue;
@@ -47,7 +47,7 @@ TEST(PipeQueueTestAssignment, assignment_move_noData_noData)
 }
 
 
-TEST(PipeQueueTestAssignment, assignment_move_noData_data)
+TEST(PipeQueueTestAssignmentMoveCopy, move_noData_data)
 {
     PLS::PipeQueue<int> moveQueue = {1, 2, 3};
     PLS::PipeQueue<int> testQueue;
@@ -59,7 +59,7 @@ TEST(PipeQueueTestAssignment, assignment_move_noData_data)
 }
 
 
-TEST(PipeQueueTestAssignment, assignment_move_data_data)
+TEST(PipeQueueTestAssignmentMoveCopy, move_data_data)
 {
     PLS::PipeQueue<int> testQueue = {5, 6, 7, 8};
     PLS::PipeQueue<int> moveQueue = {1, 2, 3};

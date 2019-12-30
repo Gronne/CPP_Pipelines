@@ -27,9 +27,13 @@ namespace PLS
     Container container_;
     std::mutex access_lock_;
     bool is_eof_;
+
+    
   public:
     PipeQueue() : container_(), is_eof_(false) {
-      static_assert(std::is_same<T, typename Container::value_type>::value, "T and value type of container is not the same");
+      static_assert(std::is_same<T, 
+                    typename Container::value_type>::value, 
+                    "T and value type of container is not the same");
     }
     ~PipeQueue() { }
 
@@ -81,17 +85,22 @@ namespace PLS
 
     bool try_pop(T & t) {
       std::lock_guard<std::mutex> lock(access_lock_);
+
       if(container_.empty())
         return false;
+
       t = std::move(container_.front());
       container_.pop_front();
+
       return true;
     }
     
+
     void swap(PipeQueue& other) {
       std::lock_guard<std::mutex> lock(access_lock_);
       container_.swap(other.container_);
     }
+
 
     // Can
     bool eof() {
@@ -121,10 +130,7 @@ namespace PLS
 
     bool operator<(PipeQueue& other) {
       std::lock_guard<std::mutex> lock(access_lock_);
-      if (container_.size() < other.size())
-        return true;
-      else
-        return false;
+      return container_.size() < other.size();
     }
 
     bool operator==(PipeQueue& other) {
@@ -134,12 +140,14 @@ namespace PLS
 
     bool operator!=(PipeQueue& other) {
       std::lock_guard<std::mutex> lock(access_lock_);
-      return container_ != other.container_;
+      return (container_ == other.container_) == false;
     }
 
     template<typename H>
     friend PipeQueue<H>& operator<<(PipeQueue<H>& pipe, H&& input);
 
+    template<typename H>
+    friend PipeQueue<H>& operator<<(PipeQueue<H>& pipe, H& input);
 
     template<typename H>
     friend bool operator>>(PipeQueue<H>& pipe, H& output);
@@ -149,6 +157,13 @@ namespace PLS
   template<typename H>
   PipeQueue<H>& operator<<(PipeQueue<H>&  pipe, H&& input) {
     pipe.push(std::move(input));
+    return pipe;
+  }
+
+
+  template<typename H>
+  PipeQueue<H>& operator<<(PipeQueue<H>&  pipe, H& input) {
+    pipe.push(input);
     return pipe;
   }
 
