@@ -2,8 +2,6 @@
 #include <string>
 #include <sstream>
 #include <fstream>
-#include "PipeQueue.hpp"
-#include "TaskFactory.hpp"
 #include <map>
 #include <regex>
 #include <iterator>
@@ -12,21 +10,27 @@
 #include <cctype>
 #include <algorithm>
 
+#include "PipeQueue.hpp"
+#include "TaskFactory.hpp"
 
 
-void readFile(std::string& path, PLS::PipeQueue<std::string>& out)
+
+void readFile(const std::vector<std::string> &file_address_list, PLS::PipeQueue<std::string>& out)
 {
-  std::cout << "readFile: path: "<< path << std::endl << std::flush;
-
-  std::ifstream input(path);
-  if(input.is_open())
+  for(auto &path : file_address_list)
   {
-    std::string line;
-    while (std::getline(input, line))
-      out << std::move(line);
+    std::cout << "readFile: path: "<< path << std::endl << std::flush;
+
+    std::ifstream input(path);
+    if(input.is_open())
+    {
+      std::string line;
+      while (std::getline(input, line))
+        out << std::move(line);
+    }
+    else
+      std::cout << "failed to open " << path << std::endl << std::flush;
   }
-  else
-    std::cout << "failed to open " << path << std::endl << std::flush;
     
   std::cout << "Done reading files" << std::endl << std::flush;
   out.set_eof(); 
@@ -48,6 +52,20 @@ struct ReduceFunctor
 
 
 int main(int argc, char *argv[]) {
+  if(argc < 2)
+    exit(0);
+
+  std::vector<std::string> main_argument_list;
+
+  std::for_each(&argv[1], &argv[argc], [&main_argument_list](std::string &argument) {
+    if(std::ifstream(argument).good())
+      main_argument_list.push_back(std::move(argument));
+    else 
+      std::cout << "File does not exist: " << argument << std::endl;
+  });
+
+
+
   //std::std::cout << "Hello world!" << std::std::endl;
   PLS::PipeQueue<std::string> lines, words;
   std::map<std::string, PLS::PipeQueue<std::string>> map;
@@ -90,10 +108,9 @@ int main(int argc, char *argv[]) {
   };
 
 
-  std::string filePath = "Example/Books/Dracula.txt";      //Should this just be given as input to main?
 
   std::cout << "Starting to get lines" << std::endl;
-  std::future<void> f1 = PLS::TaskFactory::start_async_task(readFile, filePath, lines); // Read lines from books
+  std::future<void> f1 = PLS::TaskFactory::start_async_task(::readFile, main_argument_list, lines); // Read lines from books
 
   std::cout << "Starting to get words" << std::endl;
   std::future<void> f2 = PLS::TaskFactory::start_async_task(lambda, lines, words); // Test with lambda
