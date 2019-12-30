@@ -13,25 +13,22 @@
 #include <algorithm>
 
 
-using namespace std;
-using namespace PLS;
 
-
-void readFile(string& path, PipeQueue<string>& out)
+void readFile(std::string& path, PLS::PipeQueue<std::string>& out)
 {
-  cout << "readFile: path: "<< path << endl << flush;
+  std::cout << "readFile: path: "<< path << std::endl << std::flush;
 
-  ifstream input(path);
+  std::ifstream input(path);
   if(input.is_open())
   {
-    string line;
+    std::string line;
     while (std::getline(input, line))
       out << std::move(line);
   }
   else
-    cout << "failed to open " << path << endl << flush;
+    std::cout << "failed to open " << path << std::endl << std::flush;
     
-  cout << "Done reading files" << endl << flush;
+  std::cout << "Done reading files" << std::endl << std::flush;
   out.set_eof(); 
 }
 
@@ -39,8 +36,8 @@ void readFile(string& path, PipeQueue<string>& out)
 //Functor example
 struct ReduceFunctor
 {
-  void operator()(map<string, vector<string>> &in, map<string, int> &out) {
-    for_each(in.begin(), in.end(), [&out](tuple<string, vector<string>> pair){
+  void operator()(std::map<std::string, std::vector<std::string>> &in, std::map<std::string, int> &out) {
+    for_each(in.begin(), in.end(), [&out](std::tuple<std::string, std::vector<std::string>> pair){
       // accumelate vector in pair
       // insert new pair with pair key as key and accumelate result as value into out
     });
@@ -50,34 +47,34 @@ struct ReduceFunctor
 
 
 
-int main() {
-  //std::cout << "Hello world!" << std::endl;
-  PipeQueue<string> lines, words;
-  map<string, PipeQueue<string>> map;
+int main(int argc, char *argv[]) {
+  //std::std::cout << "Hello world!" << std::std::endl;
+  PLS::PipeQueue<std::string> lines, words;
+  std::map<std::string, PLS::PipeQueue<std::string>> map;
 
-  decltype(auto) lambda = [](PipeQueue<string>& in, PipeQueue<string>& out) {
-    cout << "Started to read words" << endl << flush;
+  decltype(auto) lambda = [](PLS::PipeQueue<std::string>& in, PLS::PipeQueue<std::string>& out) {
+    std::cout << "Started to read words" << std::endl << std::flush;
     
     while(in.eof() == false)
     {
-      string line;
+      std::string line;
 
       if(in.try_pop(line) == false)
       {
-        this_thread::sleep_for(chrono::milliseconds(2));
+        std::this_thread::sleep_for(std::chrono::milliseconds(2));
         continue;
       }
       
       // Find words in line. Ignore non-word characters
       // https://en.cppreference.com/w/cpp/regex
       std::regex re("(\\w+)", std::regex_constants::ECMAScript);
-      auto words_begin = sregex_iterator(line.begin(), line.end(), re);
-      auto words_end = sregex_iterator();
+      auto words_begin = std::sregex_iterator(line.begin(), line.end(), re);
+      auto words_end = std::sregex_iterator();
 
-      for (sregex_iterator i = words_begin; i != words_end; ++i) {
-          string match = (*i).str();
+      for (std::sregex_iterator i = words_begin; i != words_end; ++i) {
+          std::string match = (*i).str();
           // algorithm 
-          // https://en.cppreference.com/w/cpp/string/byte/tolower
+          // https://en.cppreference.com/w/cpp/std::string/byte/tolower
           transform(match.begin(), 
                     match.end(), 
                     match.begin(), 
@@ -88,28 +85,28 @@ int main() {
       }
     }
 
-    cout << "Done reading words" << endl << flush;
+    std::cout << "Done reading words" << std::endl << std::flush;
     out.set_eof();
   };
 
 
-  string filePath = "Example/Books/Dracula.txt";      //Should this just be given as input to main?
+  std::string filePath = "Example/Books/Dracula.txt";      //Should this just be given as input to main?
 
-  cout << "Starting to get lines" << endl;
-  future<void> f1 = TaskFactory::start_async_task(readFile, filePath, lines); // Read lines from books
+  std::cout << "Starting to get lines" << std::endl;
+  std::future<void> f1 = PLS::TaskFactory::start_async_task(readFile, filePath, lines); // Read lines from books
 
-  cout << "Starting to get words" << endl;
-  future<void> f2 = TaskFactory::start_async_task(lambda, lines, words); // Test with lambda
+  std::cout << "Starting to get words" << std::endl;
+  std::future<void> f2 = PLS::TaskFactory::start_async_task(lambda, lines, words); // Test with lambda
 
-  cout << "Starting to map words" << endl;
-  auto f3 = TaskFactory::start_async_task([](PipeQueue<string> &in, std::map<string, PipeQueue<string>> &map){
-    cout << "Started to map words " << endl << flush;
+  std::cout << "Starting to map words" << std::endl;
+  auto f3 = PLS::TaskFactory::start_async_task([](PLS::PipeQueue<std::string> &in, std::map<std::string, PLS::PipeQueue<std::string>> &map){
+    std::cout << "Started to map words " << std::endl << std::flush;
     while(!in.eof())
     {
-      string word;
+      std::string word;
       if(!in.try_pop(word))
       {
-        this_thread::sleep_for(chrono::milliseconds(2));
+        std::this_thread::sleep_for(std::chrono::milliseconds(2));
         continue;
       }
       
@@ -121,24 +118,24 @@ int main() {
       }
       else
       {
-        PipeQueue<string> q;
+        PLS::PipeQueue<std::string> q;
         q.push(word);
         map.insert_or_assign(word, q);
       }
     }
-    cout << "Mapping done" << endl;
+    std::cout << "Mapping done" << std::endl;
   },
   words,
   map);
-  //todo create future for ReduceFunctor
+  //todo create std::future for ReduceFunctor
 
-  cout << "Waiting for all end" << endl;
+  std::cout << "Waiting for all end" << std::endl;
 
-  TaskFactory::wait_all(f1, f2, f3);
+  PLS::TaskFactory::wait_all(f1, f2, f3);
 
-  cout << "wait_all done" << endl;
+  std::cout << "wait_all done" << std::endl;
   auto t = map.find("alone");
-  cout << "Word 'Alone' count: " << t->second.size() << endl;
+  std::cout << "Word 'Alone' count: " << t->second.size() << std::endl;
 
-  //PipeQueue<string, std::vector<int>> test; // Test that another type in the vec
+  //PLS::PipeQueue<std::string, std::vector<int>> test; // Test that another type in the vec
 }
