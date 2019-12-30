@@ -1,5 +1,4 @@
 #include "PipeQueueAssignmentEqualTo.h"
-#include "PipeQueueAssignmentInOut.h"
 #include "PipeQueueAssignmentLesser.h"
 #include "PipeQueueAssignmentMoveCopy.h"
 #include "PipeQueueClear.h"

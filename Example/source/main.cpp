@@ -25,11 +25,11 @@ void readFile(const std::vector<std::string> &file_address_list, PLS::PipeQueue<
     {
       std::string line;
       while (std::getline(input, line))
-        out << std::move(line);
+        out.push(std::move(line));
     }
     else
       std::cout << "failed to open " << path << std::endl << std::flush;
-    }
+  }
     
   std::cout << "Done reading files" << std::endl << std::flush;
   out.set_eof(); 
@@ -98,7 +98,7 @@ int main(int argc, char *argv[]) {
                     [](unsigned char c){ return tolower(c); }
                    );
 
-          out << std::move(match);
+          out.push(std::move(match));
       }
     }
 
