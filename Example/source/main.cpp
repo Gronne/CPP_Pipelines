@@ -25,11 +25,11 @@ void readFile(const std::vector<std::string> &file_address_list, PLS::PipeQueue<
     {
       std::string line;
       while (std::getline(input, line))
-        out << std::move(line);
+        out.push(std::move(line));
     }
     else
       std::cout << "failed to open " << path << std::endl << std::flush;
-    }
+  }
     
   std::cout << "Done reading files" << std::endl << std::flush;
   out.set_eof(); 
@@ -69,7 +69,7 @@ int main(int argc, char *argv[]) {
   PLS::PipeQueue<std::string> lines, words;
   std::map<std::string, PLS::PipeQueue<std::string>> map;
 
-  decltype(auto) lambda = [](PLS::PipeQueue<std::string>& in, PLS::PipeQueue<std::string>& out) {
+  decltype(auto) split_sentance_to_words = [](PLS::PipeQueue<std::string>& in, PLS::PipeQueue<std::string>& out) {
     std::cout << "Started to read words" << std::endl << std::flush;
     
     while(in.eof() == false)
@@ -98,7 +98,7 @@ int main(int argc, char *argv[]) {
                     [](unsigned char c){ return tolower(c); }
                    );
 
-          out << std::move(match);
+          out.push(std::move(match));
       }
     }
 
@@ -112,7 +112,7 @@ int main(int argc, char *argv[]) {
   std::future<void> f1 = PLS::TaskFactory::start_async_task(::readFile, main_argument_list, lines); // Read lines from books
 
   std::cout << "Starting to get words" << std::endl;
-  std::future<void> f2 = PLS::TaskFactory::start_async_task(lambda, lines, words); // Test with lambda
+  std::future<void> f2 = PLS::TaskFactory::start_async_task(split_sentance_to_words, lines, words); // Test with lambda
 
   std::cout << "Starting to map words" << std::endl;
   auto f3 = PLS::TaskFactory::start_async_task([](PLS::PipeQueue<std::string> &in, std::map<std::string, PLS::PipeQueue<std::string>> &map){

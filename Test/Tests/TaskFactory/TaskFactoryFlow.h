@@ -8,10 +8,10 @@ TEST(TaskFactoryTestFlow, flow_one_task)
             int buffer;
             while(!in.eof())
             {
-                if((in >> buffer) == false)
+                if(in.try_pop(buffer) == false)
                     continue;
                 
-                out << buffer;
+                out.push(buffer);
             }
 
             out.set_eof();
@@ -39,10 +39,10 @@ TEST(TaskFactoryTestFlow, flow_two_tasks)
             int buffer;
             while(!in.eof())
             {
-                if((in >> buffer) == false)
+                if(in.try_pop(buffer) == false)
                     continue;
                 
-                out << buffer;
+                out.push(buffer);
             }
 
             out.set_eof();
@@ -71,10 +71,10 @@ TEST(TaskFactoryTestFlow, flow_two_tasks_one_inputPipe)
             int buffer;
             while(!in.eof())
             {
-                if((in >> buffer) == false)
+                if(in.try_pop(buffer) == false)
                     continue;
                 
-                out << buffer;
+                out.push(buffer);
             }
 
             out.set_eof();
@@ -103,11 +103,11 @@ TEST(TaskFactoryTestFlow, flow_one_tasks_two_pipes)
             int buffer;
             while(!in.eof())
             {
-                if((in >> buffer) == false)
+                if(in.try_pop(buffer) == false)
                     continue;
 
-                ASSERT_NO_THROW(outA << buffer);
-                ASSERT_NO_THROW(outB << buffer);
+                ASSERT_NO_THROW(outA.push(buffer));
+                ASSERT_NO_THROW(outB.push(buffer));
             }
             
             outA.set_eof();
