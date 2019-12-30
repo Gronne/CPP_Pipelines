@@ -20,7 +20,6 @@ void readFile(const std::vector<std::string> &file_address_list, PLS::PipeQueue<
   for(auto &path : file_address_list)
   {
     std::cout << "readFile: path: "<< path << std::endl << std::flush;
-
     std::ifstream input(path);
     if(input.is_open())
     {
@@ -30,7 +29,7 @@ void readFile(const std::vector<std::string> &file_address_list, PLS::PipeQueue<
     }
     else
       std::cout << "failed to open " << path << std::endl << std::flush;
-  }
+    }
     
   std::cout << "Done reading files" << std::endl << std::flush;
   out.set_eof(); 
@@ -57,9 +56,9 @@ int main(int argc, char *argv[]) {
 
   std::vector<std::string> main_argument_list;
 
-  std::for_each(&argv[1], &argv[argc], [&main_argument_list](std::string &argument) {
+  std::for_each(&argv[1], &argv[argc], [&main_argument_list](const std::string &argument) {
     if(std::ifstream(argument).good())
-      main_argument_list.push_back(std::move(argument));
+      main_argument_list.push_back(argument);
     else 
       std::cout << "File does not exist: " << argument << std::endl;
   });

@@ -56,7 +56,7 @@ namespace PLS
     }
 
 
-    const ssize_t size()  {
+    ssize_t size()  {
       std::lock_guard<std::mutex> lock(access_lock_);
       return container_.size();
     }
