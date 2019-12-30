@@ -16,26 +16,25 @@
 using namespace std;
 using namespace PLS;
 
+
 void readFile(string& path, PipeQueue<string>& out)
 {
   cout << "readFile: path: "<< path << endl << flush;
+
   ifstream input(path);
   if(input.is_open())
   {
-    while (!input.eof())
-    {
-      string line;
-      getline(input, line);
-      out.push(std::move(line));
-    }
+    string line;
+    while (std::getline(input, line))
+      out << std::move(line);
   }
   else
-  {
     cout << "failed to open " << path << endl << flush;
-  }
+    
   cout << "Done reading files" << endl << flush;
   out.set_eof(); 
 }
+
 
 //Functor example
 struct ReduceFunctor
@@ -48,19 +47,22 @@ struct ReduceFunctor
   }
 };
 
+
+
+
 int main() {
   //std::cout << "Hello world!" << std::endl;
   PipeQueue<string> lines, words;
   map<string, PipeQueue<string>> map;
 
   decltype(auto) lambda = [](PipeQueue<string>& in, PipeQueue<string>& out) {
-    
     cout << "Started to read words" << endl << flush;
-    while(!in.eof())
+    
+    while(in.eof() == false)
     {
       string line;
 
-      if(!in.try_pop(line))
+      if(in.try_pop(line) == false)
       {
         this_thread::sleep_for(chrono::milliseconds(2));
         continue;
