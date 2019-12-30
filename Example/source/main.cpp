@@ -37,13 +37,30 @@ void readFile(const std::vector<std::string> &file_address_list, PLS::PipeQueue<
 
 
 //Functor example
-struct ReduceFunctor
+struct MapReduceFunctor
 {
-  void operator()(std::map<std::string, std::vector<std::string>> &in, std::map<std::string, int> &out) {
-    for_each(in.begin(), in.end(), [&out](std::tuple<std::string, std::vector<std::string>> pair){
-      // accumelate vector in pair
-      // insert new pair with pair key as key and accumelate result as value into out
-    });
+  void operator()(PLS::PipeQueue<std::string> &in, std::map<std::string, int> &map) {
+    std::cout << "Started to map words " << std::endl << std::flush;
+    while(!in.eof())
+    {
+      std::string word;
+      if(!in.try_pop(word))
+      {
+        std::this_thread::sleep_for(std::chrono::milliseconds(2));
+        continue;
+      }
+      
+      auto temp = map.find(word);
+      if(temp != map.end())
+      {
+        map[word]++;
+      }
+      else
+      {
+        map.insert_or_assign(word, 1);
+      }
+    }
+    std::cout << "Mapping done" << std::endl;
   }
 };
 
@@ -103,7 +120,7 @@ int main(int argc, char *argv[]) {
 
 
   PLS::PipeQueue<std::string> lines, words;
-  std::map<std::string, PLS::PipeQueue<std::string>> map;
+  std::map<std::string, int> map;
 
   std::cout << "Starting to get lines" << std::endl;
   std::future<void> f1 = PLS::TaskFactory::start_async_task(::readFile, valid_address_list, lines); // Read lines from books
@@ -111,35 +128,8 @@ int main(int argc, char *argv[]) {
   std::cout << "Starting to get words" << std::endl;
   std::future<void> f2 = PLS::TaskFactory::start_async_task(split_sentance_to_words, lines, words); // Test with lambda
 
-  std::cout << "Starting to map words" << std::endl;
-  auto f3 = PLS::TaskFactory::start_async_task([](PLS::PipeQueue<std::string> &in, std::map<std::string, PLS::PipeQueue<std::string>> &map){
-    std::cout << "Started to map words " << std::endl << std::flush;
-    while(!in.eof())
-    {
-      std::string word;
-      if(!in.try_pop(word))
-      {
-        std::this_thread::sleep_for(std::chrono::milliseconds(2));
-        continue;
-      }
-      
-      auto temp = map.find(word);
-      if(map.end() != temp)
-      {
-        temp->second.push(word);
-        map.insert_or_assign(word, temp->second);
-      }
-      else
-      {
-        PLS::PipeQueue<std::string> q;
-        q.push(word);
-        map.insert_or_assign(word, q);
-      }
-    }
-    std::cout << "Mapping done" << std::endl;
-  },
-  words,
-  map);
+  std::cout << "Starting to map and reduce words" << std::endl;
+  auto f3 = PLS::TaskFactory::start_async_task(MapReduceFunctor(), words, map);
   //todo create std::future for ReduceFunctor
 
   std::cout << "Waiting for all end" << std::endl;
@@ -148,7 +138,7 @@ int main(int argc, char *argv[]) {
 
   std::cout << "wait_all done" << std::endl;
   auto t = map.find("alone");
-  std::cout << "Word 'Alone' count: " << t->second.size() << std::endl;
+  std::cout << "Word 'Alone' count: " << t->second << std::endl;
 
   //PLS::PipeQueue<std::string, std::vector<int>> test; // Test that another type in the vec
 }
