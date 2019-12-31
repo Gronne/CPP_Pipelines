@@ -52,7 +52,7 @@ struct MapReduceFunctor
       }
 
       if(map.find(word) == map.end())
-        map.insert_or_assign(word, 1);
+        map.emplace(word, 0);
 
       map[word]++;
     }
