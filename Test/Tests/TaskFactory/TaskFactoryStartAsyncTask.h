@@ -177,13 +177,6 @@ TEST(TaskFactoryTeststart_async_task, async_lambda_manyExtraParam)
 }
 
 
-TEST(TaskFactoryTeststart_async_task, async_function)
-{
-    
-    //Don't quite know how to test this
-
-}
-
 TEST(TaskFactoryTeststart_async_task, async_different_type_pipes)
 {
     decltype(auto) lambdaFunction = [](PLS::PipeQueue<int> &A, PLS::PipeQueue<std::string> &B) {};
