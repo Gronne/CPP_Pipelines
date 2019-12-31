@@ -50,16 +50,11 @@ struct MapReduceFunctor
         std::this_thread::sleep_for(std::chrono::milliseconds(2));
         continue;
       }
-      
-      auto temp = map.find(word);
-      if(temp != map.end())
-      {
-        map[word]++;
-      }
-      else
-      {
+
+      if(map.find(word) == map.end())
         map.insert_or_assign(word, 1);
-      }
+
+      map[word]++;
     }
     std::cout << "Mapping done" << std::endl;
   }
