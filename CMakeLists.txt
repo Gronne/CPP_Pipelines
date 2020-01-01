@@ -5,3 +5,4 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 add_subdirectory(Pipelines)
 add_subdirectory(Example)
+add_subdirectory(Test)

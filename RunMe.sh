@@ -19,7 +19,3 @@ cd $SOURCEDIR
 
 cmake CMakeLists.txt 
 make 
-
-cd Test
-cmake CMakeLists.txt
-make
