@@ -3,23 +3,11 @@
 #include <utility>
 #include <queue>
 
-/*
-* TODO LIST:
-* - Add EOF signal
-* - Rule of x
-* - Move none template functions to cpp
-* QUESTIONS: 
-* - Do we need all the compare operators? I assume we don't intend to perform 
-    algorithms on this container
-* NOTE: 
-* - Class naming uses Pascal casing
-* - Snake case is used on container in attempt to keep the common interface
-* - Otherwise camel casing is used
-*/
 
 
 namespace PLS
 {
+  //TODO could use SFINAE to evaluate if Container has the necessary functions?
   template<typename T, typename Container = std::deque<T>>
   class PipeQueue
   {
